@@ -1,10 +1,13 @@
 import express from "express";
 import bodyParser from "body-parser";
-import { assignments as assignmentsFromFile } from "./data/assignments.js";
-import { comments as commentsFromFile } from "./data/comments.js";
+// import { assignments as assignmentsFromFile } from "./data/assignments.js";
+// import { comments as commentsFromFile } from "./data/comments.js";
 
-let assignments = [...assignmentsFromFile];
-let comments = [...commentsFromFile];
+// let assignments = [...assignmentsFromFile];
+// let comments = [...commentsFromFile];
+
+import assignmentRouter from "./apps/assignments.js";
+import accountRouter from "./apps/accounts.js";
 
 const app = express();
 const port = 4000;
@@ -15,157 +18,160 @@ app.get("/", (req, res) => {
   return res.send("Hello Teacher!!");
 });
 
-app.get("/assignments", (req, res) => {
-  return res.json({
-    data: assignments,
-  });
-});
+app.use("/assignments", assignmentRouter);
+app.use("/accounts", accountRouter);
 
-app.get("/assignments/:id", (req, res) => {
-  const assignmentId = +req.params.id;
-  const hasFound = assignments.find((assign) => assign.id === assignmentId);
+// app.get("/assignments", (req, res) => {
+//   return res.json({
+//     data: assignments,
+//   });
+// });
 
-  if (!hasFound) {
-    return res.status(404).json({
-      messsage: `Assignment ${assignmentId} not found`,
-    });
-  }
+// app.get("/assignments/:id", (req, res) => {
+//   const assignmentId = +req.params.id;
+//   const hasFound = assignments.find((assign) => assign.id === assignmentId);
 
-  const assignment = assignments.filter((assign) => assign.id === assignmentId);
+//   if (!hasFound) {
+//     return res.status(404).json({
+//       messsage: `Assignment ${assignmentId} not found`,
+//     });
+//   }
 
-  return res.json({
-    data: assignment[0],
-  });
-});
+//   const assignment = assignments.filter((assign) => assign.id === assignmentId);
 
-app.post("/assignments", (req, res) => {
-  const newAssignment = req.body;
-  const newAssignmentId = assignments[assignments.length - 1].id + 1;
+//   return res.json({
+//     data: assignment[0],
+//   });
+// });
 
-  assignments.push({
-    id: newAssignmentId,
-    ...newAssignment,
-  });
+// app.post("/assignments", (req, res) => {
+//   const newAssignment = req.body;
+//   const newAssignmentId = assignments[assignments.length - 1].id + 1;
 
-  return res.json({
-    message: "New assignment has been created successfully",
-  });
-});
+//   assignments.push({
+//     id: newAssignmentId,
+//     ...newAssignment,
+//   });
 
-app.put("/assignments/:id", (req, res) => {
-  const updateAssignment = req.body;
-  const assignmentId = +req.params.id;
+//   return res.json({
+//     message: "New assignment has been created successfully",
+//   });
+// });
 
-  const hasFound = assignments.find((assign) => assign.id === assignmentId);
+// app.put("/assignments/:id", (req, res) => {
+//   const updateAssignment = req.body;
+//   const assignmentId = +req.params.id;
 
-  if (!hasFound) {
-    return res.status(404).json({
-      messsage: `Assignment ${assignmentId} not found`,
-    });
-  }
+//   const hasFound = assignments.find((assign) => assign.id === assignmentId);
 
-  const assignmentIndex = assignments.findIndex((assign) => {
-    return assign.id === assignmentId;
-  });
+//   if (!hasFound) {
+//     return res.status(404).json({
+//       messsage: `Assignment ${assignmentId} not found`,
+//     });
+//   }
 
-  assignments[assignmentIndex] = {
-    id: assignmentId,
-    ...updateAssignment,
-  };
+//   const assignmentIndex = assignments.findIndex((assign) => {
+//     return assign.id === assignmentId;
+//   });
 
-  return res.json({
-    message: `Assignment ${assignmentId} has been updated successfully`,
-  });
-});
+//   assignments[assignmentIndex] = {
+//     id: assignmentId,
+//     ...updateAssignment,
+//   };
 
-app.delete("/assignments/:id", (req, res) => {
-  const assignmentId = +req.params.id;
+//   return res.json({
+//     message: `Assignment ${assignmentId} has been updated successfully`,
+//   });
+// });
 
-  const hasFound = assignments.find((assign) => assign.id === assignmentId);
+// app.delete("/assignments/:id", (req, res) => {
+//   const assignmentId = +req.params.id;
 
-  if (!hasFound) {
-    return res.status(404).json({
-      messsage: `Assignment ${assignmentId} not found`,
-    });
-  }
+//   const hasFound = assignments.find((assign) => assign.id === assignmentId);
 
-  assignments = assignments.filter((assign) => {
-    return assign.id !== assignmentId;
-  });
+//   if (!hasFound) {
+//     return res.status(404).json({
+//       messsage: `Assignment ${assignmentId} not found`,
+//     });
+//   }
 
-  return res.json({
-    message: `Assignment ${assignmentId} has been deleted successfully`,
-  });
-});
+//   assignments = assignments.filter((assign) => {
+//     return assign.id !== assignmentId;
+//   });
 
-app.get("/assignments/:id/comments", (req, res) => {
-  const assignmentId = +req.params.id;
+//   return res.json({
+//     message: `Assignment ${assignmentId} has been deleted successfully`,
+//   });
+// });
 
-  const assignmentComments = comments.filter((comment) => {
-    return assignmentId == comment.assignmentId;
-  });
+// app.get("/assignments/:id/comments", (req, res) => {
+//   const assignmentId = +req.params.id;
 
-  return res.json({
-    data: assignmentComments,
-  });
-});
+//   const assignmentComments = comments.filter((comment) => {
+//     return assignmentId == comment.assignmentId;
+//   });
 
-app.post("/assignments/:id/comments", (req, res) => {
-  const assignmentId = +req.params.id;
-  const newComment = req.body;
-  const commentId = comments[comments.length - 1].id + 1;
+//   return res.json({
+//     data: assignmentComments,
+//   });
+// });
 
-  comments.push({
-    id: commentId,
-    assignmentId,
-    ...newComment,
-  });
+// app.post("/assignments/:id/comments", (req, res) => {
+//   const assignmentId = +req.params.id;
+//   const newComment = req.body;
+//   const commentId = comments[comments.length - 1].id + 1;
 
-  return res.json({
-    message: `Comment of assignment ${assignmentId} has been added to assignment.`,
-  });
-});
+//   comments.push({
+//     id: commentId,
+//     assignmentId,
+//     ...newComment,
+//   });
 
-app.delete("/assignments/:id/comments", (req, res) => {
-  const assignmentId = +req.params.id;
+//   return res.json({
+//     message: `Comment of assignment ${assignmentId} has been added to assignment.`,
+//   });
+// });
 
-  const hasFound = comments.find(
-    (comment) => comment.assignmentId === assignmentId
-  );
-  if (!hasFound) {
-    return res.status(404).json({
-      message: `${assignmentId} not found`,
-    });
-  }
+// app.delete("/assignments/:id/comments", (req, res) => {
+//   const assignmentId = +req.params.id;
 
-  comments = comments.filter((comment) => {
-    return comment.assignmentId != assignmentId;
-  });
+//   const hasFound = comments.find(
+//     (comment) => comment.assignmentId === assignmentId
+//   );
+//   if (!hasFound) {
+//     return res.status(404).json({
+//       message: `${assignmentId} not found`,
+//     });
+//   }
 
-  return res.json({
-    message: `Comment of assignment ${assignmentId} has been deleted.`,
-  });
-});
+//   comments = comments.filter((comment) => {
+//     return comment.assignmentId != assignmentId;
+//   });
 
-app.get("/accounts", function (req, res) {
-  res.send("View all accounts");
-});
+//   return res.json({
+//     message: `Comment of assignment ${assignmentId} has been deleted.`,
+//   });
+// });
 
-app.get("/accounts/:id", function (req, res) {
-  res.send("View an account by id");
-});
+// app.get("/accounts", function (req, res) {
+//   res.send("View all accounts");
+// });
 
-app.post("/accounts", function (req, res) {
-  res.send("Create an account");
-});
+// app.get("/accounts/:id", function (req, res) {
+//   res.send("View an account by id");
+// });
 
-app.put("/accounts/:id", function (req, res) {
-  res.send("Update an account by id");
-});
+// app.post("/accounts", function (req, res) {
+//   res.send("Create an account");
+// });
 
-app.delete("/accounts/:id", function (req, res) {
-  res.send("Delete an account by id");
-});
+// app.put("/accounts/:id", function (req, res) {
+//   res.send("Update an account by id");
+// });
+
+// app.delete("/accounts/:id", function (req, res) {
+//   res.send("Delete an account by id");
+// });
 
 app.listen(port, () => {
   console.log(`Server is running at the port ${port}`);
